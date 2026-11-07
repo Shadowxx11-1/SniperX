@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Madness BiomeSniperX Android (Discord Web)
 // @namespace    https://tampermonkey.net/
-// @version      8.2
-// @description  Android Firefox + Tampermonkey edition. Mobile UI and tap-to-open Roblox fallback.
+// @version      8.2.1
+// @description  Android Firefox + Tampermonkey edition. 2-minute default Join Lock, mobile UI and tap-to-open Roblox fallback.
 // @match        https://discord.com/*
 // @match        https://ptb.discord.com/*
 // @match        https://canary.discord.com/*
@@ -24,7 +24,7 @@
 (function () {
     'use strict';
 
-    const VERSION = '8.2 Android';
+    const VERSION = '8.2.1 Android';
     const IS_ANDROID = /Android/i.test(navigator.userAgent || '');
     const IS_TOUCH_DEVICE = IS_ANDROID && (
         (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
@@ -48,7 +48,7 @@
         realWords: ['real', 'actually', 'legit', 'true'],
 
         defaults: {
-            joinLockMs: 60000,      // Default: 1 minute after an automatic launch; changeable in Rules.
+            joinLockMs: 120000,     // Default: 2 minutes after an automatic launch; changeable in Rules.
             maxAgeSec: 45,          // never open a message older than this (0 = off)
             sound: true,
             fallbackScanMs: 1500,   // safety-net full scan interval
@@ -474,6 +474,14 @@
             const previousLock = store.get('joinLockMs', null);
             if (previousLock === null || Number(previousLock) === 0) store.set('joinLockMs', D.joinLockMs);
             store.set('joinLockMigrationV81', true);
+        }
+
+        // v8.2.1 migration: upgrade the previous automatic 1-minute default to 2 minutes.
+        // An explicitly disabled lock (0) and all other saved durations are preserved.
+        if (!store.get('joinLockMigrationV821', false)) {
+            const savedLock = store.get('joinLockMs', null);
+            if (Number(savedLock) === 60000 || savedLock === null) store.set('joinLockMs', D.joinLockMs);
+            store.set('joinLockMigrationV821', true);
         }
 
         const clampNum = (value, fallback, min, max) => {
