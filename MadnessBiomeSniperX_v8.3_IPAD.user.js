@@ -1202,7 +1202,7 @@
 /* iPadOS touch layout: compact badge, full-width panel, and a clear app-handoff button. */
 @media (pointer: coarse), (max-width: 820px) {
   .rbsx-badge{
-    right:12px; bottom:12px; min-height:44px; box-sizing:border-box;
+    right:12px; bottom:76px; min-height:44px; box-sizing:border-box;
     display:flex; align-items:center; padding:10px 14px;
     max-width:calc(100vw - 24px); font-size:13px; touch-action:manipulation;
   }
@@ -1311,7 +1311,7 @@
                     el('span', { style: 'color:' + color + ';font-weight:700', textContent: name + ' ' }),
                     el('span', { class: 'rbsx-dim', textContent: entry.t.toLocaleTimeString() + '  ' }),
                     el('span', { textContent: entry.text }));
-                if (entry.proto) line.append(' ', el('button', { class: 'rbsx-btn', textContent: 'Open', onclick: () => launch(entry.proto) }));
+                if (entry.proto) line.append(' ', el('button', { class: 'rbsx-btn', textContent: 'Open', onclick: () => launch(entry.proto, true) }));
                 if (entry.author) line.append(' ', el('button', { class: 'rbsx-btn gray', textContent: 'Block user', onclick: () => {
                     saveList('blockUsers', [...settings.blockUsers, entry.author.toLowerCase()].join(','));
                     ui.blockTa.value = settings.blockUsers.join(', ');
