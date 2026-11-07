@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Madness BiomeSniperX iPad (Free Userscripts)
 // @namespace    https://tampermonkey.net/
-// @version      8.3.1
-// @description  Free Userscripts-compatible iPad Safari edition. Touch-friendly panel and tap-to-open Roblox handoff.
+// @version      8.3.2
+// @description  Free Userscripts-compatible iPad Safari edition. 2-minute default Join Lock, touch-friendly panel and tap-to-open Roblox handoff.
 // @match        https://discord.com/*
 // @match        https://ptb.discord.com/*
 // @match        https://canary.discord.com/*
@@ -22,7 +22,7 @@
 (function () {
     'use strict';
 
-    const VERSION = '8.3.1 iPad · Userscripts';
+    const VERSION = '8.3.2 iPad · Userscripts';
     // iPadOS Safari may report itself as macOS when "Request Desktop Website" is active.
     const IS_IPAD = /iPad/i.test(navigator.userAgent || '') ||
         (navigator.platform === 'MacIntel' && Number(navigator.maxTouchPoints || 0) > 1);
@@ -44,7 +44,7 @@
         realWords: ['real', 'actually', 'legit', 'true'],
 
         defaults: {
-            joinLockMs: 60000,      // Default: 1 minute after an automatic launch; changeable in Rules.
+            joinLockMs: 120000,     // Default: 2 minutes after an automatic launch; changeable in Rules.
             maxAgeSec: 45,          // never open a message older than this (0 = off)
             sound: true,
             fallbackScanMs: 1500,   // safety-net full scan interval
@@ -478,6 +478,15 @@
             const previousLock = store.get('joinLockMs', null);
             if (previousLock === null || Number(previousLock) === 0) store.set('joinLockMs', D.joinLockMs);
             store.set('joinLockMigrationV81', true);
+        }
+
+        // v8.3.2 migration: upgrade the previous automatic 1-minute default to 2 minutes.
+        // A deliberately disabled lock (0) or any other custom duration is preserved.
+        if (!store.get('joinLockMigrationV832', false)) {
+            const savedLock = store.get('joinLockMs', null);
+            if (Number(savedLock) === 60000) store.set('joinLockMs', D.joinLockMs);
+            if (savedLock === null) store.set('joinLockMs', D.joinLockMs);
+            store.set('joinLockMigrationV832', true);
         }
 
         const clampNum = (value, fallback, min, max) => {
